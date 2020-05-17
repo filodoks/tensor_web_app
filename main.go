@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+// https://www.youtube.com/watch?v=JaPEuGmG6yQ
+
 type Page struct {
 	Title string
 	Body  []byte
