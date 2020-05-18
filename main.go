@@ -6,12 +6,15 @@ import (
 	"net/http"
 )
 
-// https://www.youtube.com/watch?v=JaPEuGmG6yQ
+// https://www.youtube.com/watch?v=KvKV_skpo3U
 
 type Page struct {
 	Title string
 	Body  []byte
 }
+
+var tmplView = template.Must(template.New("test").ParseFiles("base.html", "test.html", "index.html"))
+var tmplEdit = template.Must(template.New("edit").ParseFiles("base.html", "edit.html", "index.html"))
 
 func (p *Page) save() error {
 	f := p.Title + ".txt"
@@ -30,15 +33,19 @@ func load(title string) (*Page, error) {
 func view(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/test/"):]
 	p, _ := load(title)
-	t, _ := template.ParseFiles("test.html")
-	t.Execute(w, p)
+
+	tmplView.ExecuteTemplate(w, "base", p)
+	// t, _ := template.ParseFiles("test.html")
+	// t.Execute(w, p)
 }
 
 func edit(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/edit/"):]
 	p, _ := load(title)
-	t, _ := template.ParseFiles("edit.html")
-	t.Execute(w, p)
+
+	tmplEdit.ExecuteTemplate(w, "base", p)
+	// t, _ := template.ParseFiles("edit.html")
+	// t.Execute(w, p)
 }
 
 func save(w http.ResponseWriter, r *http.Request) {
@@ -50,6 +57,7 @@ func save(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/test/", view)
 	http.HandleFunc("/edit/", edit)
 	http.HandleFunc("/save/", save)
